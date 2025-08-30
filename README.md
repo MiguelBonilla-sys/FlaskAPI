@@ -317,32 +317,7 @@ Para probar la API puedes usar:
 3. **curl**: Ver ejemplos arriba
 4. **Python requests**: Ver ejemplo arriba
 
-## 🤝 Contribución
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-## 📝 Roadmap
-
-- [ ] Implementar autenticación JWT
-- [ ] Agregar base de datos (PostgreSQL/MySQL)
-- [ ] Implementar paginación
-- [ ] Agregar tests unitarios
-- [ ] Implementar rate limiting
-- [ ] Agregar logging avanzado
-- [ ] Dockerizar la aplicación
-
-## 🐛 Reportar Bugs
-
-Si encuentras algún bug, por favor crea un issue en GitHub con:
-
-- Descripción del problema
-- Pasos para reproducir
-- Comportamiento esperado vs actual
-- Screenshots (si aplica)
 
 ## 📄 Licencia
 
