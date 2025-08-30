@@ -9,6 +9,7 @@ dotenv==0.9.9
 Flask==3.1.2
 Flask-Bcrypt==1.0.1
 Flask-Migrate==4.1.0
+flasgger==0.9.7.1
 Flask-SQLAlchemy==3.1.1
 greenlet==3.2.4
 importlib_resources==6.5.2
