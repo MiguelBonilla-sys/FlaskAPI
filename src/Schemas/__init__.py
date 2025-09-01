@@ -33,46 +33,10 @@ def get_swagger_template():
         dict: Template de Swagger
     """
     from src.Schemas.SwaggerSchema import get_swagger_definitions, get_swagger_responses
+    from src.Utils import detect_railway_host
     
-    # Detectar el host dinámicamente con múltiples métodos
-    def detect_host_and_schemes():
-        """Detecta el host y esquemas correctos para Swagger."""
-        
-        # Método 1: Variables de entorno directas de Railway
-        railway_vars = [
-            'RAILWAY_PUBLIC_DOMAIN',
-            'RAILWAY_STATIC_URL', 
-            'PUBLIC_URL'
-        ]
-        
-        for var in railway_vars:
-            url = os.getenv(var)
-            if url:
-                host = url.replace('https://', '').replace('http://', '')
-                return host, ["https", "http"]
-        
-        # Método 2: Construir desde variables de Railway
-        service_name = os.getenv('RAILWAY_SERVICE_NAME')
-        environment = os.getenv('RAILWAY_ENVIRONMENT')
-        
-        if service_name and environment:
-            host = f"{service_name}-{environment}.up.railway.app"
-            return host, ["https", "http"]
-        
-        # Método 3: Detectar Railway por otras variables
-        if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID'):
-            # Estamos en Railway, usar tu dominio conocido
-            host = "flaskapi-production-badd.up.railway.app"
-            print(f"⚠️ [Railway] Usando dominio conocido: {host}")
-            return host, ["https", "http"]
-        
-        # Método 4: Desarrollo local
-        port = os.getenv('PORT', '5000')
-        host = f"localhost:{port}"
-        return host, ["http", "https"]
-    
-    # Obtener host y esquemas
-    host, schemes = detect_host_and_schemes()
+    # Obtener host y esquemas dinámicamente
+    host, schemes = detect_railway_host()
     print(f"🌐 [Swagger] Host configurado: {host} | Schemes: {schemes}")
     
     return {
