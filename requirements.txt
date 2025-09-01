@@ -6,11 +6,13 @@ blinker==1.9.0
 click==8.2.1
 colorama==0.4.6
 dotenv==0.9.9
+flasgger==0.9.7.1
 Flask==3.1.2
 Flask-Bcrypt==1.0.1
 Flask-Migrate==4.1.0
 Flask-SQLAlchemy==3.1.1
 greenlet==3.2.4
+gunicorn==21.2.0
 importlib_resources==6.5.2
 itsdangerous==2.2.0
 Jinja2==3.1.6
