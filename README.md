@@ -1,4 +1,4 @@
-# 🎮 API de Videojuegos con Swagger
+# 🎮 API de Videojuegos con Swagger con listas
 
 Una API REST completa y bien documentada para gestionar videojuegos con operaciones CRUD, construida con Flask y documentada con Swagger/OpenAPI.
 
