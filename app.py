@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 
 # Importar módulos de la aplicación
 from src.Config.Database import init_db, create_tables
-from src.Routes import api_bp, general_bp, get_swagger_definitions, get_swagger_responses
+from src.Routes import register_blueprints
+from src.Schemas import get_swagger_config, get_swagger_template
 from src.Middlewares.error_handler import register_error_handlers, setup_logging, log_request_info, setup_cors
 
 # Cargar variables de entorno
@@ -28,68 +29,14 @@ def create_app():
     app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     
     # Configurar Swagger
-    swagger_config = {
-        "headers": [],
-        "specs": [
-            {
-                "endpoint": 'apispec',
-                "route": '/apispec.json',
-                "rule_filter": lambda rule: True,
-                "model_filter": lambda tag: True,
-            }
-        ],
-        "static_url_path": "/flasgger_static",
-        "swagger_ui": True,
-        "specs_route": "/apidocs/"
-    }
-    
-    swagger_template = {
-        "swagger": "2.0",
-        "info": {
-            "title": os.getenv('API_TITLE', 'Videojuegos API'),
-            "description": os.getenv('API_DESCRIPTION', 'API REST para gestión de videojuegos'),
-            "version": os.getenv('API_VERSION', 'v1'),
-            "contact": {
-                "name": "API Support",
-                "email": "support@videojuegosapi.com"
-            },
-            "license": {
-                "name": "MIT License",
-                "url": "https://opensource.org/licenses/MIT"
-            }
-        },
-        "host": "localhost:5000",
-        "basePath": "/",
-        "schemes": ["http", "https"],
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "definitions": get_swagger_definitions(),
-        "responses": get_swagger_responses(),
-        "tags": [
-            {
-                "name": "Sistema",
-                "description": "Endpoints del sistema y health checks"
-            },
-            {
-                "name": "API Info",
-                "description": "Información general de la API"
-            },
-            {
-                "name": "Videojuegos",
-                "description": "Operaciones CRUD para videojuegos"
-            }
-        ]
-    }
-    
     # Inicializar Swagger
-    Swagger(app, config=swagger_config, template=swagger_template)
+    Swagger(app, config=get_swagger_config(), template=get_swagger_template())
     
     # Inicializar base de datos
     init_db(app)
     
     # Registrar blueprints
-    app.register_blueprint(api_bp)
-    app.register_blueprint(general_bp)
+    register_blueprints(app)
     
     # Configurar middlewares
     register_error_handlers(app)
