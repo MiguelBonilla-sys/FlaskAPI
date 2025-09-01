@@ -19,6 +19,12 @@ application = create_app()
 # Variable que Railway y otros servicios buscan
 app = application
 
+# Log de información del entorno para debugging
+print("🚀 WSGI App iniciado")
+print(f"📍 Puerto: {os.environ.get('PORT', '5000')}")
+print(f"🌐 Dominio Railway: {os.environ.get('RAILWAY_PUBLIC_DOMAIN', 'No configurado')}")
+print(f"🔧 Entorno: {os.environ.get('RAILWAY_ENVIRONMENT', 'desarrollo')}")
+
 if __name__ == "__main__":
     # Para pruebas locales del WSGI
     port = int(os.environ.get('PORT', 5000))

@@ -33,12 +33,13 @@ RUN mkdir -p /app/logs && \
     chown -R user:user /opt/venv
 USER user
 
-# Exponer el puerto
+# Exponer el puerto (Railway detecta automáticamente la variable PORT)
+EXPOSE $PORT
 EXPOSE 5000
 
 # Comando de salud para Docker
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
+    CMD curl -f http://localhost:${PORT:-5000}/health || exit 1
 
 # Comando por defecto (usar Gunicorn para producción)
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "120", "src.wsgi.wsgi:application"]
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 4 --timeout 120 src.wsgi.wsgi:application"]
