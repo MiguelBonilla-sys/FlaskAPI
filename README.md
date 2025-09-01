@@ -255,6 +255,7 @@ curl -X POST http://localhost:5000/api/videojuegos \
 Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
 
 
+
 ## 🔗 Enlaces
 
 - [Documentación de Flask](https://flask.palletsprojects.com/)
