@@ -44,6 +44,10 @@ def create_app():
     log_request_info(app)
     setup_cors(app)
     
+    # Configurar middlewares de seguridad
+    from src.Middlewares.error_handler import setup_security_middlewares
+    setup_security_middlewares(app)
+    
     # Ruta raíz que redirige a la documentación
     @app.route('/')
     def index():

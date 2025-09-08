@@ -4,6 +4,8 @@ Middleware para el manejo de errores de la aplicación.
 from flask import jsonify, request
 from werkzeug.exceptions import HTTPException
 from src.Utils import create_error_response
+from src.Middlewares.rate_limiter import setup_rate_limiting
+from src.Middlewares.auth import setup_authentication
 import logging
 
 def register_error_handlers(app):
@@ -127,7 +129,6 @@ def log_request_info(app):
         app.logger.info(f'Response: {response.status_code}')
         return response
 
-# Middleware para CORS básico
 def setup_cors(app):
     """
     Configura CORS básico para la aplicación.
@@ -140,6 +141,46 @@ def setup_cors(app):
     def after_request(response):
         """Agrega headers CORS a todas las respuestas."""
         response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-API-Key')
         response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
         return response
+
+def setup_security_middlewares(app):
+    """
+    Configura todos los middlewares de seguridad.
+    
+    Args:
+        app: Instancia de la aplicación Flask
+    """
+    # Configurar rate limiting
+    setup_rate_limiting(app)
+    
+    # Configurar autenticación
+    setup_authentication(app)
+    
+    # Configurar validación de entrada
+    from src.Middlewares.input_validation import setup_input_validation
+    setup_input_validation(app)
+    
+    # Headers de seguridad adicionales
+    @app.after_request
+    def add_security_headers(response):
+        """Agrega headers de seguridad."""
+        # Prevenir ataques de clickjacking
+        response.headers['X-Frame-Options'] = 'DENY'
+        
+        # Prevenir MIME type sniffing
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        
+        # Habilitar XSS protection
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        
+        # Política de referrer
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        
+        # Content Security Policy básica
+        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+        
+        return response
+    
+    app.logger.info('Middlewares de seguridad configurados exitosamente')
