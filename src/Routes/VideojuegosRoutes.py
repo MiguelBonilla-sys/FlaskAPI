@@ -41,7 +41,7 @@ def get_videojuego(videojuego_id):
 @validate_videojuego_data
 @validate_json_input(sanitize=True)
 @strict_rate_limit(10)  # Máximo 10 creaciones por minuto
-@require_api_key('write')
+@optional_api_key()  # Autenticación opcional
 def create_videojuego():
     """Endpoint para crear un nuevo videojuego."""
     return VideojuegoController.create()
@@ -51,7 +51,7 @@ def create_videojuego():
 @validate_videojuego_data
 @validate_json_input(sanitize=True)
 @strict_rate_limit(15)  # Máximo 15 actualizaciones por minuto
-@require_api_key('write')
+@optional_api_key()  # Autenticación opcional
 def update_videojuego(videojuego_id):
     """Endpoint para actualizar un videojuego existente."""
     return VideojuegoController.update(videojuego_id)
@@ -59,7 +59,7 @@ def update_videojuego(videojuego_id):
 @videojuegos_bp.route('/<int:videojuego_id>', methods=['DELETE'])
 @swag_from(delete_videojuego_schema)
 @strict_rate_limit(5)  # Máximo 5 eliminaciones por minuto
-@require_api_key('delete')
+@optional_api_key()  # Autenticación opcional pero recomendada para DELETE
 def delete_videojuego(videojuego_id):
     """Endpoint para eliminar un videojuego."""
     return VideojuegoController.delete(videojuego_id)

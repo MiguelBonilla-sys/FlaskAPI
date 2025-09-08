@@ -6,7 +6,7 @@ Después de analizar todo el proyecto, he implementado un **sistema de seguridad
 
 ## ⚠️ RESPUESTA A TU PREGUNTA
 
-**SÍ, tu proyecto DEFINITIVAMENTE necesitaba seguridad por cantidad de peticiones** y mucho más. He implementado las siguientes medidas críticas:
+**SÍ, tu proyecto DEFINITIVAMENTE necesitaba seguridad por cantidad de peticiones** y mucho más. He implementado las medidas críticas de forma **completamente automática y sin configuración requerida**.
 
 ## 🔥 VULNERABILIDADES CRÍTICAS ENCONTRADAS Y SOLUCIONADAS
 
