@@ -72,7 +72,8 @@ def get_swagger_definitions():
                 'nombre': 'Nuevo Videojuego',
                 'categoria': 'Aventura', 
                 'precio': 49.99,
-                'valoracion': 8.5
+                'valoracion': 8.5,
+                "desarrolladora_id": 1
             }
         },
         'VideojuegoUpdateInput': {
