@@ -141,6 +141,8 @@ class VideojuegoService:
             validation_data['precio'] = data['precio']
         if 'valoracion' in data:
             validation_data['valoracion'] = data['valoracion']
+        if 'desarrolladora_id' in data:
+            validation_data['desarrolladora_id'] = data['desarrolladora_id']
         
         # Si no hay datos para actualizar
         if not validation_data:
@@ -155,6 +157,10 @@ class VideojuegoService:
                 'precio': validation_data.get('precio', videojuego.precio),
                 'valoracion': validation_data.get('valoracion', videojuego.valoracion)
             }
+            
+            # Incluir desarrolladora_id en la validación si se proporciona
+            if 'desarrolladora_id' in validation_data:
+                complete_data['desarrolladora_id'] = validation_data['desarrolladora_id']
             
             is_valid, errors = Videojuego.validate_data(complete_data)
             if not is_valid:

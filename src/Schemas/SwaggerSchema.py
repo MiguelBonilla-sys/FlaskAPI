@@ -97,6 +97,11 @@ def get_swagger_definitions():
                     'minimum': 0, 
                     'maximum': 10, 
                     'example': 9.5
+                },
+                'desarrolladora_id': {
+                    'type': 'integer',
+                    'example': 2,
+                    'description': 'ID de la desarrolladora (opcional)'
                 }
             }
         },
