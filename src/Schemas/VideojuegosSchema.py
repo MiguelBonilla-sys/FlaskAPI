@@ -85,13 +85,37 @@ get_videojuego_schema = {
 create_videojuego_schema = {
     'tags': ['Videojuegos'],
     'summary': 'Crear un nuevo videojuego',
-    'description': 'Crea un nuevo videojuego con los datos proporcionados',
+    'description': '''Crea un nuevo videojuego con los datos proporcionados.
+    
+**Para asociar una desarrolladora**:
+1. Usar GET /desarrolladoras para obtener la lista completa
+2. Copiar el ID de la desarrolladora deseada
+3. Incluir ese ID en el campo desarrolladora_id (opcional)
+
+**Campos requeridos**: nombre, categoria, precio, valoracion
+**Campos opcionales**: desarrolladora_id
+
+**Ejemplo con desarrolladora**:
+```json
+{
+    "nombre": "Nuevo Videojuego",
+    "categoria": "RPG",
+    "precio": 59.99,
+    "valoracion": 9.2,
+    "desarrolladora_id": 1
+}
+```''',
     'parameters': [
         {
             'name': 'body',
             'in': 'body',
             'required': True,
-            'description': 'Datos del videojuego a crear',
+            'description': '''Datos del videojuego a crear.
+
+**Para usar desarrolladora_id**: 
+- Primero consultar GET /desarrolladoras para ver las opciones
+- Usar el ID numérico de la desarrolladora deseada
+- El campo es opcional, puede omitirse''',
             'schema': {'$ref': '#/definitions/VideojuegoInput'}
         }
     ],

@@ -65,9 +65,14 @@ def get_swagger_definitions():
                 },
                 'desarrolladora_id': {
                     'type': 'integer',
-                    'example': 2,
-                    'description': 'ID de la desarrolladora (opcional)'
+                    'description': 'ID de la desarrolladora que desarrolló el videojuego (opcional). Usar GET /desarrolladoras para ver las opciones disponibles.'
                 }
+            },
+            'example': {
+                'nombre': 'Nuevo Videojuego',
+                'categoria': 'Aventura', 
+                'precio': 49.99,
+                'valoracion': 8.5
             }
         },
         'VideojuegoUpdateInput': {
@@ -100,8 +105,7 @@ def get_swagger_definitions():
                 },
                 'desarrolladora_id': {
                     'type': 'integer',
-                    'example': 2,
-                    'description': 'ID de la desarrolladora (opcional)'
+                    'description': 'ID de la desarrolladora que desarrolló el videojuego (opcional). Usar GET /desarrolladoras para ver las opciones disponibles.'
                 }
             }
         },
