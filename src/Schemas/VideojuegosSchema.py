@@ -18,8 +18,15 @@ get_videojuegos_schema = {
             'name': 'buscar',
             'in': 'query',
             'type': 'string',
-            'description': 'Buscar en nombre y categoría',
+            'description': 'Buscar en nombre, categoría y desarrolladora',
             'example': 'zelda'
+        },
+        {
+            'name': 'desarrolladora_id',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'Filtrar por desarrolladora',
+            'example': 1
         }
     ],
     'responses': {
@@ -228,6 +235,76 @@ get_estadisticas_schema = {
                 }
             }
         },
+        500: {'$ref': '#/responses/InternalServerError'}
+    }
+}
+
+busqueda_avanzada_schema = {
+    'tags': ['Videojuegos'],
+    'summary': 'Búsqueda avanzada de videojuegos',
+    'description': 'Realiza una búsqueda avanzada con múltiples filtros',
+    'parameters': [
+        {
+            'name': 'categoria',
+            'in': 'query',
+            'type': 'string',
+            'description': 'Filtrar por categoría',
+            'example': 'RPG'
+        },
+        {
+            'name': 'precio_min',
+            'in': 'query',
+            'type': 'number',
+            'description': 'Precio mínimo',
+            'example': 10.0
+        },
+        {
+            'name': 'precio_max',
+            'in': 'query',
+            'type': 'number',
+            'description': 'Precio máximo',
+            'example': 60.0
+        },
+        {
+            'name': 'valoracion_min',
+            'in': 'query',
+            'type': 'number',
+            'description': 'Valoración mínima (0-10)',
+            'example': 8.0
+        },
+        {
+            'name': 'desarrolladora_id',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'ID de la desarrolladora',
+            'example': 1
+        },
+        {
+            'name': 'buscar',
+            'in': 'query',
+            'type': 'string',
+            'description': 'Buscar en nombre, categoría y desarrolladora',
+            'example': 'zelda'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Búsqueda avanzada realizada exitosamente',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'success': {'type': 'boolean', 'example': True},
+                    'message': {'type': 'string', 'example': 'Búsqueda avanzada realizada exitosamente con filtros: categoría: RPG, precio mín: $10.0'},
+                    'data': {
+                        'type': 'array',
+                        'items': {'$ref': '#/definitions/Videojuego'}
+                    },
+                    'count': {'type': 'integer', 'example': 3},
+                    'timestamp': {'type': 'string', 'format': 'date-time'}
+                }
+            }
+        },
+        400: {'$ref': '#/responses/BadRequest'},
         500: {'$ref': '#/responses/InternalServerError'}
     }
 }

@@ -11,7 +11,8 @@ from src.Schemas.VideojuegosSchema import (
     update_videojuego_schema,
     delete_videojuego_schema,
     get_categorias_schema,
-    get_estadisticas_schema
+    get_estadisticas_schema,
+    busqueda_avanzada_schema
 )
 
 # Crear blueprint para las rutas de videojuegos
@@ -58,3 +59,9 @@ def get_categorias():
 def get_estadisticas():
     """Endpoint para obtener estadísticas de videojuegos."""
     return VideojuegoController.get_statistics()
+
+@videojuegos_bp.route('/busqueda-avanzada', methods=['GET'])
+@swag_from(busqueda_avanzada_schema)
+def busqueda_avanzada():
+    """Endpoint para búsqueda avanzada con múltiples filtros."""
+    return VideojuegoController.busqueda_avanzada()

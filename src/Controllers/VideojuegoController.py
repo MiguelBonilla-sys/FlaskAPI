@@ -23,11 +23,24 @@ class VideojuegoController:
             # Obtener parámetros de consulta
             categoria = request.args.get('categoria', '').strip()
             buscar = request.args.get('buscar', '').strip()
+            desarrolladora_id = request.args.get('desarrolladora_id', '').strip()
+            
+            # Convertir desarrolladora_id a entero si se proporciona
+            desarrolladora_id_int = None
+            if desarrolladora_id:
+                try:
+                    desarrolladora_id_int = int(desarrolladora_id)
+                except ValueError:
+                    return create_error_response(
+                        message="El ID de desarrolladora debe ser un número entero",
+                        status_code=400
+                    )
             
             # Obtener videojuegos sin paginación
             result = VideojuegoService.get_all(
                 categoria=categoria if categoria else None,
                 buscar=buscar if buscar else None,
+                desarrolladora_id=desarrolladora_id_int,
                 page=1,
                 per_page=1000  # Número alto para obtener todos
             )
@@ -35,6 +48,8 @@ class VideojuegoController:
             message = "Videojuegos obtenidos exitosamente"
             if categoria:
                 message += f" (filtrado por categoría: {categoria})"
+            if desarrolladora_id_int:
+                message += f" (filtrado por desarrolladora ID: {desarrolladora_id_int})"
             if buscar:
                 message += f" (búsqueda: {buscar})"
             
@@ -251,6 +266,108 @@ class VideojuegoController:
         except Exception as e:
             return create_error_response(
                 message="Error al obtener las estadísticas",
+                status_code=500,
+                errors=[str(e)]
+            )
+    
+    @staticmethod
+    def busqueda_avanzada():
+        """
+        Realiza una búsqueda avanzada con múltiples filtros.
+        
+        Returns:
+            tuple: (response, status_code)
+        """
+        try:
+            # Obtener parámetros de consulta
+            categoria = request.args.get('categoria', '').strip() or None
+            buscar = request.args.get('buscar', '').strip() or None
+            
+            # Parámetros numéricos
+            precio_min = request.args.get('precio_min')
+            precio_max = request.args.get('precio_max')
+            valoracion_min = request.args.get('valoracion_min')
+            desarrolladora_id = request.args.get('desarrolladora_id')
+            
+            # Convertir parámetros numéricos
+            try:
+                precio_min = float(precio_min) if precio_min else None
+                precio_max = float(precio_max) if precio_max else None
+                valoracion_min = float(valoracion_min) if valoracion_min else None
+                desarrolladora_id = int(desarrolladora_id) if desarrolladora_id else None
+            except ValueError as ve:
+                return create_error_response(
+                    message="Parámetros numéricos inválidos",
+                    status_code=400,
+                    errors=[f"Error en conversión de números: {str(ve)}"]
+                )
+            
+            # Validaciones
+            if precio_min is not None and precio_min < 0:
+                return create_error_response(
+                    message="El precio mínimo debe ser mayor o igual a 0",
+                    status_code=400
+                )
+                
+            if precio_max is not None and precio_max < 0:
+                return create_error_response(
+                    message="El precio máximo debe ser mayor o igual a 0",
+                    status_code=400
+                )
+                
+            if precio_min is not None and precio_max is not None and precio_min > precio_max:
+                return create_error_response(
+                    message="El precio mínimo no puede ser mayor al precio máximo",
+                    status_code=400
+                )
+                
+            if valoracion_min is not None and (valoracion_min < 0 or valoracion_min > 10):
+                return create_error_response(
+                    message="La valoración mínima debe estar entre 0 y 10",
+                    status_code=400
+                )
+            
+            # Realizar búsqueda
+            result = VideojuegoService.busqueda_avanzada(
+                categoria=categoria,
+                precio_min=precio_min,
+                precio_max=precio_max,
+                valoracion_min=valoracion_min,
+                desarrolladora_id=desarrolladora_id,
+                buscar=buscar,
+                page=1,
+                per_page=1000
+            )
+            
+            # Construir mensaje descriptivo
+            filtros_activos = []
+            if categoria:
+                filtros_activos.append(f"categoría: {categoria}")
+            if precio_min is not None:
+                filtros_activos.append(f"precio mín: ${precio_min}")
+            if precio_max is not None:
+                filtros_activos.append(f"precio máx: ${precio_max}")
+            if valoracion_min is not None:
+                filtros_activos.append(f"valoración mín: {valoracion_min}")
+            if desarrolladora_id:
+                filtros_activos.append(f"desarrolladora ID: {desarrolladora_id}")
+            if buscar:
+                filtros_activos.append(f"búsqueda: {buscar}")
+            
+            message = "Búsqueda avanzada realizada exitosamente"
+            if filtros_activos:
+                message += f" con filtros: {', '.join(filtros_activos)}"
+            
+            return create_response(
+                success=True,
+                message=message,
+                data=result['videojuegos'],
+                count=result['total']
+            )
+            
+        except Exception as e:
+            return create_error_response(
+                message="Error al realizar la búsqueda avanzada",
                 status_code=500,
                 errors=[str(e)]
             )

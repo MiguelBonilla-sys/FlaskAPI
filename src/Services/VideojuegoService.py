@@ -12,31 +12,41 @@ class VideojuegoService:
     """
     
     @staticmethod
-    def get_all(categoria=None, buscar=None, page=1, per_page=10):
+    def get_all(categoria=None, buscar=None, desarrolladora_id=None, page=1, per_page=10):
         """
         Obtiene todos los videojuegos con filtros opcionales.
         
         Args:
             categoria (str): Filtro por categoría
             buscar (str): Búsqueda en nombre y categoría
+            desarrolladora_id (int): Filtro por desarrolladora
             page (int): Número de página para paginación
             per_page (int): Elementos por página
             
         Returns:
             dict: Resultados paginados
         """
+        from src.Models.Desarrolladora import Desarrolladora
+        
         query = Videojuego.query
+        
+        # Join con desarrolladora para poder hacer búsquedas
+        query = query.outerjoin(Desarrolladora)
         
         # Aplicar filtros
         if categoria:
             query = query.filter(Videojuego.categoria.ilike(f'%{categoria}%'))
+            
+        if desarrolladora_id:
+            query = query.filter(Videojuego.desarrolladora_id == desarrolladora_id)
             
         if buscar:
             search_term = f'%{buscar}%'
             query = query.filter(
                 or_(
                     Videojuego.nombre.ilike(search_term),
-                    Videojuego.categoria.ilike(search_term)
+                    Videojuego.categoria.ilike(search_term),
+                    Desarrolladora.nombre.ilike(search_term)
                 )
             )
         
@@ -228,4 +238,82 @@ class VideojuegoService:
             'categorias_unicas': categorias_unicas,
             'precio_promedio': float(precio_promedio) if precio_promedio else 0,
             'valoracion_promedio': float(valoracion_promedio) if valoracion_promedio else 0
+        }
+    
+    @staticmethod
+    def busqueda_avanzada(categoria=None, precio_min=None, precio_max=None, 
+                         valoracion_min=None, desarrolladora_id=None, buscar=None, 
+                         page=1, per_page=10):
+        """
+        Realiza una búsqueda avanzada con múltiples filtros.
+        
+        Args:
+            categoria (str): Filtro por categoría
+            precio_min (float): Precio mínimo
+            precio_max (float): Precio máximo
+            valoracion_min (float): Valoración mínima
+            desarrolladora_id (int): ID de la desarrolladora
+            buscar (str): Búsqueda en nombre, categoría y desarrolladora
+            page (int): Número de página
+            per_page (int): Elementos por página
+            
+        Returns:
+            dict: Resultados paginados
+        """
+        from src.Models.Desarrolladora import Desarrolladora
+        
+        query = Videojuego.query.outerjoin(Desarrolladora)
+        
+        # Aplicar filtros
+        if categoria:
+            query = query.filter(Videojuego.categoria.ilike(f'%{categoria}%'))
+            
+        if precio_min is not None:
+            query = query.filter(Videojuego.precio >= precio_min)
+            
+        if precio_max is not None:
+            query = query.filter(Videojuego.precio <= precio_max)
+            
+        if valoracion_min is not None:
+            query = query.filter(Videojuego.valoracion >= valoracion_min)
+            
+        if desarrolladora_id:
+            query = query.filter(Videojuego.desarrolladora_id == desarrolladora_id)
+            
+        if buscar:
+            search_term = f'%{buscar}%'
+            query = query.filter(
+                or_(
+                    Videojuego.nombre.ilike(search_term),
+                    Videojuego.categoria.ilike(search_term),
+                    Desarrolladora.nombre.ilike(search_term)
+                )
+            )
+        
+        # Ordenar por valoración descendente por defecto
+        query = query.order_by(Videojuego.valoracion.desc())
+        
+        # Paginación
+        pagination = query.paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
+        
+        return {
+            'videojuegos': [videojuego.to_dict() for videojuego in pagination.items],
+            'total': pagination.total,
+            'pages': pagination.pages,
+            'current_page': page,
+            'per_page': per_page,
+            'has_next': pagination.has_next,
+            'has_prev': pagination.has_prev,
+            'filtros_aplicados': {
+                'categoria': categoria,
+                'precio_min': precio_min,
+                'precio_max': precio_max,
+                'valoracion_min': valoracion_min,
+                'desarrolladora_id': desarrolladora_id,
+                'buscar': buscar
+            }
         }

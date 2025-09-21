@@ -18,6 +18,15 @@ def get_swagger_definitions():
                 'categoria': {'type': 'string', 'example': 'Aventura'},
                 'precio': {'type': 'number', 'format': 'float', 'example': 59.99},
                 'valoracion': {'type': 'number', 'format': 'float', 'example': 9.7},
+                'desarrolladora_id': {'type': 'integer', 'example': 1},
+                'desarrolladora': {
+                    'type': 'object',
+                    'properties': {
+                        'id': {'type': 'integer', 'example': 1},
+                        'nombre': {'type': 'string', 'example': 'Nintendo'},
+                        'pais': {'type': 'string', 'example': 'Japón'}
+                    }
+                },
                 'fecha_creacion': {'type': 'string', 'format': 'date-time'},
                 'fecha_actualizacion': {'type': 'string', 'format': 'date-time'}
             }
@@ -50,6 +59,11 @@ def get_swagger_definitions():
                     'minimum': 0, 
                     'maximum': 10, 
                     'example': 9.3
+                },
+                'desarrolladora_id': {
+                    'type': 'integer',
+                    'example': 2,
+                    'description': 'ID de la desarrolladora (opcional)'
                 }
             }
         },

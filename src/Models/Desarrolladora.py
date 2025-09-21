@@ -14,7 +14,7 @@ class Desarrolladora(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre = db.Column(db.String(100), nullable=False, unique=True)
     pais = db.Column(db.String(100), nullable=True)
-    fundacion = db.Column(db.Date, nullable=True)
+    fundacion = db.Column(db.Integer, nullable=True)  # Formato YYYYMMDD
     sitio_web = db.Column(db.String(200), nullable=True)
     descripcion = db.Column(db.Text, nullable=True)
     
@@ -32,7 +32,7 @@ class Desarrolladora(db.Model):
         Args:
             nombre (str): Nombre de la desarrolladora
             pais (str, optional): País de origen
-            fundacion (date, optional): Fecha de fundación
+            fundacion (int, optional): Fecha de fundación en formato YYYYMMDD
             sitio_web (str, optional): Sitio web oficial
             descripcion (str, optional): Descripción de la desarrolladora
         """
@@ -62,7 +62,7 @@ class Desarrolladora(db.Model):
             'id': self.id,
             'nombre': self.nombre,
             'pais': self.pais,
-            'fundacion': self.fundacion.isoformat() if self.fundacion else None,
+            'fundacion': self.fundacion,  # Ya es un entero en formato YYYYMMDD
             'sitio_web': self.sitio_web,
             'descripcion': self.descripcion,
             'fecha_creacion': self.fecha_creacion.isoformat() if self.fecha_creacion else None,
