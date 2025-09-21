@@ -170,7 +170,7 @@ def detect_railway_host():
     # Método 3: Detectar Railway por otras variables
     if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID'):
         # Estamos en Railway, usar dominio conocido actualizado
-        host = "flaskapi-production-8e3e.up.railway.app"
+        host = "flaskapi-production-a966.up.railway.app"
         print(f"⚠️ [Railway] Usando dominio conocido: {host}")
         return host, ["https", "http"]
     
