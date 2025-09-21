@@ -18,11 +18,14 @@ class Videojuego(db.Model):
     precio = db.Column(db.Numeric(10, 2), nullable=False)
     valoracion = db.Column(db.Numeric(3, 1), nullable=False)
     
+    # Relación con desarrolladora
+    desarrolladora_id = db.Column(db.Integer, db.ForeignKey('desarrolladoras.id'), nullable=True)
+    
     # Campos de auditoría
     fecha_creacion = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     fecha_actualizacion = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    def __init__(self, nombre, categoria, precio, valoracion):
+    def __init__(self, nombre, categoria, precio, valoracion, desarrolladora_id=None):
         """
         Constructor del modelo Videojuego.
         
@@ -31,11 +34,13 @@ class Videojuego(db.Model):
             categoria (str): Categoría del videojuego
             precio (float): Precio del videojuego
             valoracion (float): Valoración del videojuego (0-10)
+            desarrolladora_id (int, optional): ID de la desarrolladora
         """
         self.nombre = nombre
         self.categoria = categoria
         self.precio = precio
         self.valoracion = valoracion
+        self.desarrolladora_id = desarrolladora_id
     
     def __repr__(self):
         """
@@ -53,15 +58,26 @@ class Videojuego(db.Model):
         Returns:
             dict: Diccionario con los datos del videojuego
         """
-        return {
+        result = {
             'id': self.id,
             'nombre': self.nombre,
             'categoria': self.categoria,
             'precio': float(self.precio),
             'valoracion': float(self.valoracion),
+            'desarrolladora_id': self.desarrolladora_id,
             'fecha_creacion': self.fecha_creacion.isoformat() if self.fecha_creacion else None,
             'fecha_actualizacion': self.fecha_actualizacion.isoformat() if self.fecha_actualizacion else None
         }
+        
+        # Incluir información de la desarrolladora si existe
+        if self.desarrolladora:
+            result['desarrolladora'] = {
+                'id': self.desarrolladora.id,
+                'nombre': self.desarrolladora.nombre,
+                'pais': self.desarrolladora.pais
+            }
+        
+        return result
     
     @classmethod
     def from_dict(cls, data):
@@ -78,7 +94,8 @@ class Videojuego(db.Model):
             nombre=data.get('nombre'),
             categoria=data.get('categoria'),
             precio=data.get('precio'),
-            valoracion=data.get('valoracion')
+            valoracion=data.get('valoracion'),
+            desarrolladora_id=data.get('desarrolladora_id')
         )
     
     def update_from_dict(self, data):
@@ -96,6 +113,8 @@ class Videojuego(db.Model):
             self.precio = data['precio']
         if 'valoracion' in data:
             self.valoracion = data['valoracion']
+        if 'desarrolladora_id' in data:
+            self.desarrolladora_id = data['desarrolladora_id']
     
     @staticmethod
     def validate_data(data):

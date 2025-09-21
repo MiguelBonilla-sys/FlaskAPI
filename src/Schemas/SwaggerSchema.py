@@ -158,6 +158,82 @@ def get_swagger_responses():
                 }
             }
         },
+        'Desarrolladora': {
+            'type': 'object',
+            'properties': {
+                'id': {'type': 'integer', 'example': 1},
+                'nombre': {'type': 'string', 'example': 'Nintendo'},
+                'pais': {'type': 'string', 'example': 'Japón'},
+                'fundacion': {'type': 'string', 'format': 'date', 'example': '1889-09-23'},
+                'sitio_web': {'type': 'string', 'example': 'https://www.nintendo.com'},
+                'descripcion': {'type': 'string', 'example': 'Empresa japonesa de videojuegos fundada en 1889.'},
+                'fecha_creacion': {'type': 'string', 'format': 'date-time'},
+                'fecha_actualizacion': {'type': 'string', 'format': 'date-time'}
+            }
+        },
+        'DesarrolladoraInput': {
+            'type': 'object',
+            'required': ['nombre'],
+            'properties': {
+                'nombre': {
+                    'type': 'string',
+                    'example': 'Capcom',
+                    'minLength': 1,
+                    'maxLength': 100
+                },
+                'pais': {
+                    'type': 'string',
+                    'example': 'Japón',
+                    'maxLength': 100
+                },
+                'fundacion': {
+                    'type': 'string',
+                    'format': 'date',
+                    'example': '1979-05-30',
+                    'description': 'Fecha de fundación en formato YYYY-MM-DD'
+                },
+                'sitio_web': {
+                    'type': 'string',
+                    'example': 'https://www.capcom.com',
+                    'maxLength': 200
+                },
+                'descripcion': {
+                    'type': 'string',
+                    'example': 'Desarrolladora y editora japonesa de videojuegos.'
+                }
+            }
+        },
+        'DesarrolladoraUpdateInput': {
+            'type': 'object',
+            'properties': {
+                'nombre': {
+                    'type': 'string',
+                    'example': 'Capcom Co., Ltd.',
+                    'minLength': 1,
+                    'maxLength': 100
+                },
+                'pais': {
+                    'type': 'string',
+                    'example': 'Japón',
+                    'maxLength': 100
+                },
+                'fundacion': {
+                    'type': 'string',
+                    'format': 'date',
+                    'example': '1979-05-30',
+                    'description': 'Fecha de fundación en formato YYYY-MM-DD'
+                },
+                'sitio_web': {
+                    'type': 'string',
+                    'example': 'https://www.capcom.com',
+                    'maxLength': 200
+                },
+                'descripcion': {
+                    'type': 'string',
+                    'example': 'Desarrolladora y editora japonesa de videojuegos con sede en Osaka.'
+                }
+            }
+        },
         'SuccessResponse': {
             'description': 'Operación exitosa',
             'schema': {
