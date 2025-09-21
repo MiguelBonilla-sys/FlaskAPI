@@ -74,8 +74,13 @@ class Videojuego(db.Model):
             result['desarrolladora'] = {
                 'id': self.desarrolladora.id,
                 'nombre': self.desarrolladora.nombre,
-                'pais': self.desarrolladora.pais
+                'pais': self.desarrolladora.pais,
+                'fundacion': self.desarrolladora.fundacion,
+                'sitio_web': self.desarrolladora.sitio_web,
+                'descripcion': self.desarrolladora.descripcion
             }
+        else:
+            result['desarrolladora'] = None
         
         return result
     
@@ -162,5 +167,16 @@ class Videojuego(db.Model):
                     errors.append('La valoración debe estar entre 0 y 10')
             except (ValueError, TypeError):
                 errors.append('La valoración debe ser un número válido')
+        
+        # Validar desarrolladora_id (opcional)
+        if 'desarrolladora_id' in data and data['desarrolladora_id'] is not None:
+            try:
+                desarrolladora_id = int(data['desarrolladora_id'])
+                # Validar que la desarrolladora existe
+                from src.Models.Desarrolladora import Desarrolladora
+                if not Desarrolladora.query.get(desarrolladora_id):
+                    errors.append(f'La desarrolladora con ID {desarrolladora_id} no existe')
+            except (ValueError, TypeError):
+                errors.append('El ID de desarrolladora debe ser un número entero válido')
         
         return len(errors) == 0, errors

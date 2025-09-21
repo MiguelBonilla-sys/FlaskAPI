@@ -24,7 +24,10 @@ def get_swagger_definitions():
                     'properties': {
                         'id': {'type': 'integer', 'example': 1},
                         'nombre': {'type': 'string', 'example': 'Nintendo'},
-                        'pais': {'type': 'string', 'example': 'Japón'}
+                        'pais': {'type': 'string', 'example': 'Japón'},
+                        'fundacion': {'type': 'integer', 'example': 18890923, 'description': 'Fecha de fundación en formato YYYYMMDD'},
+                        'sitio_web': {'type': 'string', 'example': 'https://www.nintendo.com'},
+                        'descripcion': {'type': 'string', 'example': 'Compañía japonesa de videojuegos conocida por Mario, Zelda y Pokémon'}
                     }
                 },
                 'fecha_creacion': {'type': 'string', 'format': 'date-time'},
@@ -178,7 +181,7 @@ def get_swagger_responses():
                 'id': {'type': 'integer', 'example': 1},
                 'nombre': {'type': 'string', 'example': 'Nintendo'},
                 'pais': {'type': 'string', 'example': 'Japón'},
-                'fundacion': {'type': 'string', 'format': 'date', 'example': '1889-09-23'},
+                'fundacion': {'type': 'integer', 'example': 18890923, 'description': 'Fecha de fundación en formato YYYYMMDD'},
                 'sitio_web': {'type': 'string', 'example': 'https://www.nintendo.com'},
                 'descripcion': {'type': 'string', 'example': 'Empresa japonesa de videojuegos fundada en 1889.'},
                 'fecha_creacion': {'type': 'string', 'format': 'date-time'},
@@ -201,10 +204,9 @@ def get_swagger_responses():
                     'maxLength': 100
                 },
                 'fundacion': {
-                    'type': 'string',
-                    'format': 'date',
-                    'example': '1979-05-30',
-                    'description': 'Fecha de fundación en formato YYYY-MM-DD'
+                    'type': 'integer',
+                    'example': 19790530,
+                    'description': 'Fecha de fundación en formato YYYYMMDD'
                 },
                 'sitio_web': {
                     'type': 'string',
