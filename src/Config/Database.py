@@ -20,6 +20,12 @@ def init_db(app):
     Args:
         app: Instancia de la aplicación Flask
     """
+    # Si ya está configurada (por ejemplo, en tests), no sobrescribir
+    if 'SQLALCHEMY_DATABASE_URI' in app.config:
+        db.init_app(app)
+        migrate.init_app(app, db)
+        return db
+    
     # Verificar si hay una URL de base de datos personalizada
     database_url = os.getenv('DATABASE_URL')
     
@@ -42,10 +48,13 @@ def init_db(app):
     
     # Configuraciones adicionales de SQLAlchemy
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        'pool_pre_ping': True,
-        'pool_recycle': 300,
-    }
+    
+    # Solo configurar pool para PostgreSQL (no para SQLite)
+    if not app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite'):
+        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+            'pool_pre_ping': True,
+            'pool_recycle': 300,
+        }
     
     # Inicializar extensiones
     db.init_app(app)

@@ -1,0 +1,147 @@
+version: '3.8'
+
+# Configuración para desarrollo local
+# Uso: docker-compose -f docker-compose.dev.yml up
+
+services:
+  # Redis - Broker y Backend para Celery
+  redis:
+    image: redis:7-alpine
+    container_name: flaskapi_redis_dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_dev:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flaskapi_network_dev
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: flaskapi_postgres_dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: flaskapi
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flaskapi_network_dev
+
+  # Flask Application (Development)
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flaskapi_web_dev
+    command: python app.py
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/flaskapi
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - RAWG_API_KEY=${RAWG_API_KEY}
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - SECRET_KEY=dev-secret-key-change-in-production
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    networks:
+      - flaskapi_network_dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Celery Worker (Development)
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flaskapi_celery_worker_dev
+    command: celery -A celery_worker.celery worker --loglevel=debug --concurrency=2
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/flaskapi
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - RAWG_API_KEY=${RAWG_API_KEY}
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - SECRET_KEY=dev-secret-key-change-in-production
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      web:
+        condition: service_started
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    networks:
+      - flaskapi_network_dev
+    restart: unless-stopped
+
+  # Celery Beat (Development)
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flaskapi_celery_beat_dev
+    command: celery -A celery_worker.celery beat --loglevel=debug
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/flaskapi
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - RAWG_API_KEY=${RAWG_API_KEY}
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - SECRET_KEY=dev-secret-key-change-in-production
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      web:
+        condition: service_started
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    networks:
+      - flaskapi_network_dev
+    restart: unless-stopped
+
+volumes:
+  redis_data_dev:
+    driver: local
+  postgres_data_dev:
+    driver: local
+
+networks:
+  flaskapi_network_dev:
+    driver: bridge
+

@@ -37,7 +37,11 @@ def get_swagger_template():
     
     # Obtener host y esquemas dinámicamente
     host, schemes = detect_railway_host()
-    print(f"🌐 [Swagger] Host configurado: {host} | Schemes: {schemes}")
+    try:
+        print(f"[Swagger] Host configurado: {host} | Schemes: {schemes}")
+    except UnicodeEncodeError:
+        # En Windows con codificación limitada, usar mensaje simple
+        print(f"[Swagger] Host: {host} | Schemes: {schemes}")
     
     return {
         "swagger": "2.0",

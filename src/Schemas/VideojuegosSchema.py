@@ -332,3 +332,286 @@ busqueda_avanzada_schema = {
         500: {'$ref': '#/responses/InternalServerError'}
     }
 }
+
+importar_externa_schema = {
+    'tags': ['Videojuegos'],
+    'summary': 'Importar videojuego desde RAWG',
+    'description': 'Importa un videojuego desde RAWG API usando su external_id',
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'external_id': {
+                        'type': 'string',
+                        'description': 'ID del juego en RAWG',
+                        'example': '3328'
+                    }
+                },
+                'required': ['external_id']
+            }
+        }
+    ],
+    'responses': {
+        201: {
+            'description': 'Juego importado exitosamente',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'success': {'type': 'boolean', 'example': True},
+                    'message': {'type': 'string'},
+                    'data': {'$ref': '#/definitions/Videojuego'}
+                }
+            }
+        },
+        400: {'$ref': '#/responses/BadRequest'},
+        503: {'description': 'Error en API externa'}
+    }
+}
+
+importar_batch_schema = {
+    'tags': ['Videojuegos'],
+    'summary': 'Importar videojuegos desde RAWG',
+    'description': '''Importa videojuegos desde RAWG API. Si no se proporcionan juegos en el body, importa automáticamente juegos populares evitando los que ya existen. Usa el parámetro "count" para especificar cuántos juegos importar.
+
+Ejemplos de uso:
+
+# 1. Sin parámetros (default: 6 juegos)
+POST /api/videojuegos/importar-batch
+Body: {}
+
+# 2. Con parámetro count (importa 10 juegos populares)
+POST /api/videojuegos/importar-batch?count=10
+Body: {}
+
+# 3. Con juegos específicos (ignora count)
+POST /api/videojuegos/importar-batch?count=5
+Body: {"games": [{"external_id": "3328"}]}''',
+    'parameters': [
+        {
+            'name': 'count',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'Cantidad de juegos populares a importar (default: 6, máx: 50). Solo aplica si no se proporcionan juegos en el body.',
+            'required': False,
+            'default': 6,
+            'minimum': 1,
+            'maximum': 50,
+            'example': 6
+        },
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': False,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'games': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'object',
+                            'properties': {
+                                'external_id': {
+                                    'type': 'string',
+                                    'description': 'ID del juego en RAWG',
+                                    'example': '3328'
+                                }
+                            },
+                            'required': ['external_id']
+                        },
+                        'description': 'Lista de juegos a importar. Si no se proporciona, se importan automáticamente juegos populares (evitando los que ya existen).',
+                        'example': [{'external_id': '3328'}, {'external_id': '3498'}]
+                    }
+                }
+            }
+        }
+    ],
+    'responses': {
+        201: {
+            'description': 'Juegos importados exitosamente',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'success': {'type': 'boolean'},
+                    'message': {'type': 'string'},
+                    'data': {
+                        'type': 'object',
+                        'properties': {
+                            'success': {'type': 'array'},
+                            'failed': {'type': 'array'},
+                            'skipped': {'type': 'array'}
+                        }
+                    }
+                }
+            }
+        },
+        207: {'description': 'Multi-Status: algunos exitosos, algunos fallidos'},
+        400: {'$ref': '#/responses/BadRequest'}
+    }
+}
+
+get_enriquecido_schema = {
+    'tags': ['Videojuegos'],
+    'summary': 'Obtener videojuego enriquecido',
+    'description': 'Obtiene un videojuego con datos adicionales de RAWG (screenshots, plataformas, tags)',
+    'parameters': [
+        {
+            'name': 'videojuego_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID del videojuego',
+            'example': 1
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Juego enriquecido obtenido exitosamente',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'success': {'type': 'boolean'},
+                    'message': {'type': 'string'},
+                    'data': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'integer'},
+                            'nombre': {'type': 'string'},
+                            'screenshots': {'type': 'array', 'items': {'type': 'string'}},
+                            'plataformas': {'type': 'array', 'items': {'type': 'string'}},
+                            'tags': {'type': 'array', 'items': {'type': 'string'}}
+                        }
+                    }
+                }
+            }
+        },
+        404: {'$ref': '#/responses/NotFound'}
+    }
+}
+
+buscar_hibrida_schema = {
+    'tags': ['Videojuegos'],
+    'summary': 'Búsqueda híbrida',
+    'description': 'Busca videojuegos en BD local y opcionalmente en RAWG',
+    'parameters': [
+        {
+            'name': 'q',
+            'in': 'query',
+            'type': 'string',
+            'required': True,
+            'description': 'Término de búsqueda',
+            'example': 'zelda'
+        },
+        {
+            'name': 'include_external',
+            'in': 'query',
+            'type': 'boolean',
+            'description': 'Incluir resultados de RAWG',
+            'example': True
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Búsqueda completada',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'success': {'type': 'boolean'},
+                    'message': {'type': 'string'},
+                    'data': {
+                        'type': 'object',
+                        'properties': {
+                            'local': {'type': 'array', 'items': {'$ref': '#/definitions/Videojuego'}},
+                            'external': {'type': 'array'}
+                        }
+                    },
+                    'count': {'type': 'integer'}
+                }
+            }
+        },
+        400: {'$ref': '#/responses/BadRequest'}
+    }
+}
+
+sync_manual_schema = {
+    'tags': ['Videojuegos'],
+    'summary': 'Iniciar sincronización asíncrona',
+    'description': 'Inicia una sincronización asíncrona de un juego desde RAWG',
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'external_id': {
+                        'type': 'string',
+                        'description': 'ID del juego en RAWG',
+                        'example': '3328'
+                    }
+                },
+                'required': ['external_id']
+            }
+        }
+    ],
+    'responses': {
+        202: {
+            'description': 'Sincronización iniciada',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'success': {'type': 'boolean'},
+                    'message': {'type': 'string'},
+                    'data': {
+                        'type': 'object',
+                        'properties': {
+                            'task_id': {'type': 'string'},
+                            'status_url': {'type': 'string'}
+                        }
+                    }
+                }
+            }
+        },
+        400: {'$ref': '#/responses/BadRequest'}
+    }
+}
+
+sync_status_schema = {
+    'tags': ['Videojuegos'],
+    'summary': 'Consultar estado de sincronización',
+    'description': 'Consulta el estado de una tarea de sincronización asíncrona',
+    'parameters': [
+        {
+            'name': 'task_id',
+            'in': 'path',
+            'type': 'string',
+            'required': True,
+            'description': 'ID de la tarea de Celery',
+            'example': 'abc123-def456-ghi789'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Estado de la sincronización',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'success': {'type': 'boolean'},
+                    'message': {'type': 'string'},
+                    'data': {
+                        'type': 'object',
+                        'properties': {
+                            'status': {'type': 'string', 'enum': ['pending', 'running', 'completed', 'failed']},
+                            'result': {'type': 'object'},
+                            'error': {'type': 'string'}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

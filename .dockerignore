@@ -1,98 +1,57 @@
-# Git y control de versiones
-.git
-.gitignore
-*.md
-LICENSE
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyEnv
-.python-version
-
-# Pipenv
-Pipfile.lock
-
-# Entornos virtuales
-.env.local
-.env.development
-.env.test
-.env.production
-venv/
-ENV/
-env/
+dist/
+build/
 .venv/
+venv/
+env/
 
-# IDEs
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+Test/
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Sistema operativo
+# OS
 .DS_Store
 Thumbs.db
 
 # Logs
-*.log
 logs/
+*.log
 
-# Base de datos local
-*.db
-*.sqlite
-*.sqlite3
+# Environment
+.env
+.env.local
+.env.*.local
 
-# Archivos temporales
-tmp/
-temp/
-.tmp/
+# Git
+.git/
+.gitignore
 
-# Documentación y ejemplos
+# Documentation
 docs/
-examples/
 *.md
-
-# Archivos de configuración local
-.env.example
-
-# Archivos de respaldo
-*.bak
-*.backup
-
-# Archivos de testing
-.coverage
-.pytest_cache/
-.tox/
-htmlcov/
-
-# Node.js (si aplica)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+!README.md
 
 # Docker
-Dockerfile.dev
-docker-compose.override.yml
+docker-compose.yml
+Dockerfile
 .dockerignore
+
+# Railway
+railway.json
+Procfile

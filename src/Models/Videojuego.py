@@ -21,11 +21,23 @@ class Videojuego(db.Model):
     # Relación con desarrolladora
     desarrolladora_id = db.Column(db.Integer, db.ForeignKey('desarrolladoras.id'), nullable=True)
     
+    # Campos para integración con APIs externas
+    external_id = db.Column(db.String(100), nullable=True)  # ID del juego en RAWG
+    api_source = db.Column(db.String(50), nullable=True, default='rawg')  # Fuente de la API
+    last_synced = db.Column(db.DateTime(timezone=True), nullable=True)  # Última sincronización
+    
+    # Campos adicionales opcionales
+    descripcion = db.Column(db.Text, nullable=True)
+    imagen_url = db.Column(db.String(500), nullable=True)
+    desarrollador = db.Column(db.String(200), nullable=True)  # Nombre del desarrollador (adicional a desarrolladora_id)
+    
     # Campos de auditoría
     fecha_creacion = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     fecha_actualizacion = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    def __init__(self, nombre, categoria, precio, valoracion, desarrolladora_id=None):
+    def __init__(self, nombre, categoria, precio, valoracion, desarrolladora_id=None, 
+                 external_id=None, api_source='rawg', descripcion=None, imagen_url=None, 
+                 desarrollador=None):
         """
         Constructor del modelo Videojuego.
         
@@ -35,12 +47,22 @@ class Videojuego(db.Model):
             precio (float): Precio del videojuego
             valoracion (float): Valoración del videojuego (0-10)
             desarrolladora_id (int, optional): ID de la desarrolladora
+            external_id (str, optional): ID del juego en API externa
+            api_source (str, optional): Fuente de la API (default: 'rawg')
+            descripcion (str, optional): Descripción del juego
+            imagen_url (str, optional): URL de la imagen del juego
+            desarrollador (str, optional): Nombre del desarrollador
         """
         self.nombre = nombre
         self.categoria = categoria
         self.precio = precio
         self.valoracion = valoracion
         self.desarrolladora_id = desarrolladora_id
+        self.external_id = external_id
+        self.api_source = api_source
+        self.descripcion = descripcion
+        self.imagen_url = imagen_url
+        self.desarrollador = desarrollador
     
     def __repr__(self):
         """
@@ -65,6 +87,12 @@ class Videojuego(db.Model):
             'precio': float(self.precio),
             'valoracion': float(self.valoracion),
             'desarrolladora_id': self.desarrolladora_id,
+            'external_id': self.external_id,
+            'api_source': self.api_source,
+            'last_synced': self.last_synced.isoformat() if self.last_synced else None,
+            'descripcion': self.descripcion,
+            'imagen_url': self.imagen_url,
+            'desarrollador': self.desarrollador,
             'fecha_creacion': self.fecha_creacion.isoformat() if self.fecha_creacion else None,
             'fecha_actualizacion': self.fecha_actualizacion.isoformat() if self.fecha_actualizacion else None
         }
@@ -100,7 +128,12 @@ class Videojuego(db.Model):
             categoria=data.get('categoria'),
             precio=data.get('precio'),
             valoracion=data.get('valoracion'),
-            desarrolladora_id=data.get('desarrolladora_id')
+            desarrolladora_id=data.get('desarrolladora_id'),
+            external_id=data.get('external_id'),
+            api_source=data.get('api_source', 'rawg'),
+            descripcion=data.get('descripcion'),
+            imagen_url=data.get('imagen_url'),
+            desarrollador=data.get('desarrollador')
         )
     
     def update_from_dict(self, data):
@@ -120,6 +153,16 @@ class Videojuego(db.Model):
             self.valoracion = data['valoracion']
         if 'desarrolladora_id' in data:
             self.desarrolladora_id = data['desarrolladora_id']
+        if 'external_id' in data:
+            self.external_id = data['external_id']
+        if 'api_source' in data:
+            self.api_source = data['api_source']
+        if 'descripcion' in data:
+            self.descripcion = data['descripcion']
+        if 'imagen_url' in data:
+            self.imagen_url = data['imagen_url']
+        if 'desarrollador' in data:
+            self.desarrollador = data['desarrollador']
     
     @staticmethod
     def validate_data(data):

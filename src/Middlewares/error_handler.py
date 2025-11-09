@@ -4,6 +4,7 @@ Middleware para el manejo de errores de la aplicación.
 from flask import jsonify, request
 from werkzeug.exceptions import HTTPException
 from src.Utils import create_error_response
+from src.Utils.exceptions import APIError, APITimeoutError, RateLimitError, CircuitBreakerOpen, InvalidDataError
 import logging
 
 def register_error_handlers(app):
@@ -69,6 +70,43 @@ def register_error_handlers(app):
             message=error.name,
             status_code=error.code,
             errors=[error.description]
+        )
+    
+    @app.errorhandler(APIError)
+    def handle_api_error(error):
+        """Maneja errores de APIs externas."""
+        if isinstance(error, APITimeoutError):
+            return create_error_response(
+                message="Timeout en API externa",
+                status_code=503,
+                errors=["La API externa no respondió a tiempo"]
+            )
+        elif isinstance(error, RateLimitError):
+            return create_error_response(
+                message="Rate limit excedido",
+                status_code=429,
+                errors=["Se ha excedido el límite de peticiones a la API externa"]
+            )
+        elif isinstance(error, CircuitBreakerOpen):
+            return create_error_response(
+                message="Servicio temporalmente no disponible",
+                status_code=503,
+                errors=["El servicio externo está temporalmente no disponible"]
+            )
+        else:
+            return create_error_response(
+                message="Error en API externa",
+                status_code=503,
+                errors=[str(error)]
+            )
+    
+    @app.errorhandler(InvalidDataError)
+    def handle_invalid_data_error(error):
+        """Maneja errores de datos inválidos."""
+        return create_error_response(
+            message="Datos inválidos",
+            status_code=400,
+            errors=[str(error)]
         )
     
     @app.errorhandler(Exception)

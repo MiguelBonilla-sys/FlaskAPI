@@ -18,12 +18,17 @@ Una API REST robusta y escalable construida con Flask para la gestión de videoj
 ## ✨ Características
 
 - 🔧 **API REST completa** - Operaciones CRUD para videojuegos
+- 🌐 **Integración RAWG API** - Importación y sincronización de juegos desde RAWG
+- 🔍 **Búsqueda híbrida** - Búsqueda en BD local y RAWG simultáneamente
 - 📚 **Documentación automática** - Integración con Swagger/OpenAPI
 - 🏗️ **Arquitectura modular** - Separación clara de responsabilidades
 - 🐘 **Base de datos PostgreSQL** - Con SQLAlchemy como ORM
--  **Manejo de errores** - Sistema robusto de gestión de errores
+- ⚡ **Caché Redis** - Optimización de rendimiento con Flask-Caching
+- 🔄 **Tareas asíncronas** - Sincronización automática con Celery
+- 🛡️ **Manejo de errores** - Sistema robusto de gestión de errores
 - 📊 **Logs estructurados** - Sistema de logging avanzado
 - 🌐 **CORS configurado** - Listo para aplicaciones frontend
+- 🧪 **Suite de tests completa** - Tests unitarios e integración
 - 🚀 **Despliegue en Railway** - Configuración incluida
 
 ## 🛠️ Tecnologías
@@ -33,6 +38,10 @@ Una API REST robusta y escalable construida con Flask para la gestión de videoj
 - **SQLAlchemy 2.0.43** - ORM para base de datos
 - **PostgreSQL** - Base de datos principal
 - **Flasgger 0.9.7.1** - Documentación Swagger
+- **RAWG API** - Integración con API de videojuegos
+- **Redis** - Caché y broker de Celery
+- **Celery** - Tareas asíncronas
+- **pytest** - Framework de testing
 - **Railway** - Plataforma de despliegue
 
 ## 🚀 Instalación
@@ -177,6 +186,18 @@ La aplicación estará disponible en:
 | DELETE | `/api/videojuegos/{id}` | Eliminar un videojuego |
 | GET | `/api/videojuegos/categorias` | Obtener todas las categorías disponibles |
 | GET | `/api/videojuegos/estadisticas` | Obtener estadísticas de videojuegos |
+| GET | `/api/videojuegos/busqueda-avanzada` | Búsqueda avanzada con múltiples filtros |
+
+### Endpoints de Integración RAWG
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/api/videojuegos/importar-externa` | Importar videojuego desde RAWG API |
+| POST | `/api/videojuegos/importar-batch` | Importar múltiples videojuegos desde RAWG |
+| GET | `/api/videojuegos/{id}/enriquecido` | Obtener videojuego con datos enriquecidos de RAWG |
+| GET | `/api/videojuegos/buscar` | Búsqueda híbrida (local + RAWG) |
+| POST | `/api/videojuegos/sync-manual` | Iniciar sincronización asíncrona manual |
+| GET | `/api/videojuegos/sync-status/{task_id}` | Consultar estado de sincronización |
 
 ### Filtros disponibles para GET /api/videojuegos
 
@@ -302,6 +323,45 @@ Contiene todo el código de la aplicación organizado en módulos específicos.
 - **requirements.txt**: Todas las dependencias necesarias con versiones específicas.
 - **Procfile**: Configuración para despliegue en Railway.
 - **runtime.txt**: Especifica la versión de Python para Railway.
+
+## 🧪 Testing
+
+El proyecto incluye una suite completa de tests para verificar todas las funcionalidades.
+
+### Ejecutar Tests
+
+**Tests unitarios (no requieren servidor):**
+```bash
+python Test/test_services.py
+```
+
+**Tests de endpoints (requieren servidor corriendo):**
+```bash
+python Test/test_videojuegos_endpoints.py
+```
+
+**Tests de integración RAWG (requieren servidor + API key):**
+```bash
+python Test/test_rawg_integration.py
+```
+
+**Ejecutar todos los tests:**
+```bash
+python Test/run_all_tests.py
+```
+
+**Con pytest (recomendado):**
+```bash
+pytest Test/ -v
+```
+
+### Tipos de Tests
+
+- **Tests Unitarios**: Verifican servicios y mappers con mocks (rápidos)
+- **Tests de Integración**: Verifican endpoints completos (requieren servidor)
+- **Tests de RAWG**: Verifican integración con API externa (requieren API key)
+
+Ver `Test/README_TESTS.md` para documentación completa de tests.
 
 ## 📖 Documentación con Swagger
 

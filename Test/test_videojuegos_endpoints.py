@@ -1,6 +1,6 @@
 """
-Script de prueba para verificar que todos los endpoints de videojuegos funcionan correctamente
-con el nuevo modelo de desarrolladoras.
+Script de prueba para verificar que todos los endpoints de videojuegos funcionan correctamente.
+Incluye tests para endpoints básicos y nuevos endpoints de integración RAWG.
 """
 import os
 import sys
@@ -119,8 +119,48 @@ def test_endpoints():
             if response.text:
                 print(f"   Respuesta: {response.text}")
         
+        # 8. Probar nuevos endpoints de RAWG (si están disponibles)
+        print("\n🌐 Probando nuevos endpoints de RAWG...")
+        
+        # Test búsqueda híbrida
+        print("\n🔍 Probando GET /api/videojuegos/buscar...")
+        response = requests.get(f"{base_url}/api/videojuegos/buscar?q=zelda&include_external=false")
+        if response.status_code == 200:
+            data = response.json()
+            print(f"✅ Búsqueda híbrida funcionando - {len(data.get('data', {}).get('local', []))} locales")
+        else:
+            print(f"⚠️  Búsqueda híbrida: {response.status_code} (puede requerir configuración)")
+        
+        # Test categorías
+        print("\n📂 Probando GET /api/videojuegos/categorias...")
+        response = requests.get(f"{base_url}/api/videojuegos/categorias")
+        if response.status_code == 200:
+            data = response.json()
+            categorias = data.get('data', [])
+            print(f"✅ Categorías obtenidas: {len(categorias)} categorías")
+            if categorias:
+                print(f"   Ejemplos: {', '.join(categorias[:5])}")
+        else:
+            print(f"❌ Error: {response.status_code}")
+        
+        # Test estadísticas
+        print("\n📊 Probando GET /api/videojuegos/estadisticas...")
+        response = requests.get(f"{base_url}/api/videojuegos/estadisticas")
+        if response.status_code == 200:
+            data = response.json()
+            stats = data.get('data', {})
+            print(f"✅ Estadísticas obtenidas:")
+            print(f"   - Total videojuegos: {stats.get('total_videojuegos', 0)}")
+            print(f"   - Categorías únicas: {stats.get('categorias_unicas', 0)}")
+            print(f"   - Precio promedio: ${stats.get('precio_promedio', 0):.2f}")
+            print(f"   - Valoración promedio: {stats.get('valoracion_promedio', 0):.1f}")
+        else:
+            print(f"❌ Error: {response.status_code}")
+        
         print("\n" + "=" * 60)
         print("🎉 Pruebas completadas!")
+        print("\n💡 Nota: Para probar endpoints de RAWG API, ejecuta:")
+        print("   python Test/test_rawg_integration.py")
         
     except requests.exceptions.ConnectionError:
         print("❌ Error: No se pudo conectar al servidor")

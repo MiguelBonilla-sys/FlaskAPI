@@ -178,3 +178,4 @@ def detect_railway_host():
     port = os.getenv('PORT', '5000')
     host = f"localhost:{port}"
     return host, ["http", "https"]
+
